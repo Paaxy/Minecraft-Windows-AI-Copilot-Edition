@@ -1,0 +1,53 @@
+<!-- index.html -->
+<html>
+  <head>
+    <title>Minecraft Clone</title>
+    <style>canvas { display: block; }</style>
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/noisejs@2.1.0/index.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const noise = new Noise(Math.random());
+      const chunkSize = 16;
+      const blockSize = 1;
+
+      function generateChunk(cx, cz) {
+        for (let x = 0; x < chunkSize; x++) {
+          for (let z = 0; z < chunkSize; z++) {
+            const worldX = cx * chunkSize + x;
+            const worldZ = cz * chunkSize + z;
+            const height = Math.floor(noise.perlin2(worldX / 50, worldZ / 50) * 10 + 10);
+            for (let y = 0; y < height; y++) {
+              const geometry = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+              const material = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+              const cube = new THREE.Mesh(geometry, material);
+              cube.position.set(worldX, y, worldZ);
+              scene.add(cube);
+            }
+          }
+        }
+      }
+
+      generateChunk(0, 0); // Initial chunk
+      camera.position.set(10, 20, 30);
+      camera.lookAt(0, 0, 0);
+
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(0, 50, 50);
+      scene.add(light);
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+    </script>
+  </body>
+</html>
